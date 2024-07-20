@@ -69,11 +69,13 @@ def sleep():
 	if result.status_code != 0: return jsonify({"error": result.std_err.decode()})
 	return jsonify({"message": result.std_out.decode().strip().split("\n")[-1]})
 
-@app.route("/api/wake")
-def wake():
-	send_magic_packet(WOL_MAC)
+@app.route("/api/wake", defaults={"mac": WOL_MAC})
+@app.route("/api/wake/<mac>")
+def wake(mac):
+	send_magic_packet(mac)
 
-	return redirect('/api/ping')
+	# todo: implement non-winrm ping
+	return redirect('/api/ping' if mac == WOL_MAC else '/')
 
 if __name__ == "__main__":
 	app.run(host="0.0.0.0", port=5000, debug=True)
