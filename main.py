@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, send_from_directory, jsonify, redirect
 from werkzeug.exceptions import NotFound
 from dotenv import load_dotenv
 import os
@@ -11,6 +11,7 @@ WINRM_HOST = os.getenv("WINRM_HOST")
 WINRM_PORT = 5986
 PSSHUTDOWN_PATH = os.getenv("PSSHUTDOWN_PATH")
 WOL_MAC = os.getenv("WOL_MAC")
+# WOL_IP = os.getenv("WOL_IP")
 
 app = Flask(__name__)
 
@@ -22,13 +23,13 @@ def serve_static(path: str):
 		return send_from_directory(app.static_folder, path)
 	except NotFound as _:
 		# if path.endswith("/"):
-		return send_from_directory(app.static_folder, path + "/index.html")
+		return send_from_directory(app.static_folder, path + "index.html")
 		# raise e
 
 @app.route("/api/ping")
 def ping():
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.settimeout(2)
+	s.settimeout(15)
 	try:
 		s.connect((WINRM_HOST, WINRM_PORT))
 		s.shutdown(socket.SHUT_RDWR)
@@ -71,6 +72,8 @@ def sleep():
 @app.route("/api/wake")
 def wake():
 	send_magic_packet(WOL_MAC)
+
+	return redirect('/api/ping')
 
 if __name__ == "__main__":
 	app.run(host="0.0.0.0", port=5000, debug=True)

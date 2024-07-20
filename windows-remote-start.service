@@ -1,0 +1,14 @@
+[Unit]
+Description=windows-remote-start
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/windows-remote-start
+Environment=PYTHONPATH=/home/ubuntu/windows-remote-start
+ExecStart=/home/ubuntu/windows-remote-start/venv/bin/gunicorn -w 2 -b 0.0.0.0:9253 'main:app'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
