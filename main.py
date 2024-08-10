@@ -16,6 +16,7 @@ WOL_MAC = os.getenv("WOL_MAC")
 app = Flask(__name__)
 
 # todo: replace with nginx rule, only send api to wsgi
+# todo: could use template and inject status into it if ssr
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def serve_static(path: str):
